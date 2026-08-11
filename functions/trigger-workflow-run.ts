@@ -100,7 +100,7 @@ export default async function handler(req:Request,res:Response){
 
     let role:string|undefined;
 
-    if(sessionRole==='admin'){
+    if(sessionRole==='admin'|| userId==='admin'){
       role='owner';
     }else{
       const member=await gql<any>(MEMBER,{
