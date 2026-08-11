@@ -85,8 +85,8 @@ export default function Home(){
       const workflowId=data.insert_workflows_one.id;
       const steps=[
         {workflow_id:workflowId,position:1,type:'llm_call',config:{prompt:'Answer with exactly one word: APPROVE or REJECT. Say APPROVE.',model:'llama-3.1-8b-instant'}},
-        {workflow_id:workflowId,position:2,type:'http_request',config:{url:'https://httpbin.org/post',method:'POST',body:{source:'agentflow',message:'hello'}}},
-        {workflow_id:workflowId,position:3,type:'conditional_branch',config:{field:'previous.output',equals:'APPROVE',then:'approval',else:'finish'}},
+        {workflow_id:workflowId,position:2,type:'conditional_branch',config:{field:'previous.output',equals:'APPROVE',then:'continue',else:'finish'}},
+        {workflow_id:workflowId,position:3,type:'http_request',config:{url:'https://httpbin.org/post',method:'POST',body:{source:'agentflow',message:'hello'}}},
         {workflow_id:workflowId,position:4,type:'approval_gate',config:{message:'Owner or editor approval required.'}}
       ];
       for(const step of steps)await request(nhost,ADD_STEP,{step});
