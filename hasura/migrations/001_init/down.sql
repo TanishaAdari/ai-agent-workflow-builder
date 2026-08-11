@@ -1,0 +1,11 @@
+DROP VIEW IF EXISTS org_usage_month;
+DROP TABLE IF EXISTS notifications;
+DROP TABLE IF EXISTS watched_events;
+DROP TABLE IF EXISTS workflow_outputs;
+DROP TABLE IF EXISTS step_runs;
+DROP TABLE IF EXISTS workflow_runs;
+DROP TABLE IF EXISTS workflow_triggers;
+DROP TABLE IF EXISTS workflow_steps;
+DROP TABLE IF EXISTS workflows;
+DROP TABLE IF EXISTS org_members;
+DROP TABLE IF EXISTS organizations;

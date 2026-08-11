@@ -1,0 +1,1265 @@
+{
+  "resource_version": 142,
+  "metadata": {
+    "version": 3,
+    "sources": [
+      {
+        "name": "default",
+        "kind": "postgres",
+        "tables": [
+          {
+            "table": {
+              "schema": "public",
+              "name": "organizations"
+            },
+            "array_relationships": [
+              {
+                "name": "members",
+                "using": {
+                  "foreign_key_constraint_on": {
+                    "column": "org_id",
+                    "table": {
+                      "schema": "public",
+                      "name": "org_members"
+                    }
+                  }
+                }
+              },
+              {
+                "name": "workflows",
+                "using": {
+                  "foreign_key_constraint_on": {
+                    "column": "org_id",
+                    "table": {
+                      "schema": "public",
+                      "name": "workflows"
+                    }
+                  }
+                }
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": "*",
+                  "filter": {
+                    "members": {
+                      "user_id": {
+                        "_eq": "X-Hasura-User-Id"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "update_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": [
+                    "name",
+                    "calls_allowed"
+                  ],
+                  "filter": {
+                    "members": {
+                      "_and": [
+                        {
+                          "user_id": {
+                            "_eq": "X-Hasura-User-Id"
+                          }
+                        },
+                        {
+                          "role": {
+                            "_eq": "owner"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "table": {
+              "schema": "public",
+              "name": "org_members"
+            },
+            "object_relationships": [
+              {
+                "name": "organization",
+                "using": {
+                  "foreign_key_constraint_on": "org_id"
+                }
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": "*",
+                  "filter": {
+                    "_or": [
+                      {
+                        "user_id": {
+                          "_eq": "X-Hasura-User-Id"
+                        }
+                      },
+                      {
+                        "organization": {
+                          "members": {
+                            "_and": [
+                              {
+                                "user_id": {
+                                  "_eq": "X-Hasura-User-Id"
+                                }
+                              },
+                              {
+                                "role": {
+                                  "_eq": "owner"
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "insert_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": [
+                    "org_id",
+                    "user_id",
+                    "role"
+                  ],
+                  "check": {
+                    "members": {
+                      "_and": [
+                        {
+                          "user_id": {
+                            "_eq": "X-Hasura-User-Id"
+                          }
+                        },
+                        {
+                          "role": {
+                            "_eq": "owner"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            ],
+            "update_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": [
+                    "role"
+                  ],
+                  "filter": {
+                    "members": {
+                      "_and": [
+                        {
+                          "user_id": {
+                            "_eq": "X-Hasura-User-Id"
+                          }
+                        },
+                        {
+                          "role": {
+                            "_eq": "owner"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "check": {
+                    "members": {
+                      "_and": [
+                        {
+                          "user_id": {
+                            "_eq": "X-Hasura-User-Id"
+                          }
+                        },
+                        {
+                          "role": {
+                            "_eq": "owner"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            ],
+            "delete_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "filter": {
+                    "members": {
+                      "_and": [
+                        {
+                          "user_id": {
+                            "_eq": "X-Hasura-User-Id"
+                          }
+                        },
+                        {
+                          "role": {
+                            "_eq": "owner"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "table": {
+              "schema": "public",
+              "name": "workflows"
+            },
+            "object_relationships": [
+              {
+                "name": "organization",
+                "using": {
+                  "foreign_key_constraint_on": "org_id"
+                }
+              }
+            ],
+            "array_relationships": [
+              {
+                "name": "workflow_steps",
+                "using": {
+                  "foreign_key_constraint_on": {
+                    "column": "workflow_id",
+                    "table": {
+                      "schema": "public",
+                      "name": "workflow_steps"
+                    }
+                  }
+                }
+              },
+              {
+                "name": "workflow_triggers",
+                "using": {
+                  "foreign_key_constraint_on": {
+                    "column": "workflow_id",
+                    "table": {
+                      "schema": "public",
+                      "name": "workflow_triggers"
+                    }
+                  }
+                }
+              },
+              {
+                "name": "workflow_runs",
+                "using": {
+                  "foreign_key_constraint_on": {
+                    "column": "workflow_id",
+                    "table": {
+                      "schema": "public",
+                      "name": "workflow_runs"
+                    }
+                  }
+                }
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": "*",
+                  "filter": {
+                    "organization": {
+                      "members": {
+                        "user_id": {
+                          "_eq": "X-Hasura-User-Id"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "insert_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": [
+                    "org_id",
+                    "name",
+                    "description"
+                  ],
+                  "check": {
+                    "organization": {
+                      "members": {
+                        "_and": [
+                          {
+                            "user_id": {
+                              "_eq": "X-Hasura-User-Id"
+                            }
+                          },
+                          {
+                            "role": {
+                              "_in": [
+                                "owner",
+                                "editor"
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "update_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": [
+                    "name",
+                    "description",
+                    "updated_at"
+                  ],
+                  "filter": {
+                    "organization": {
+                      "members": {
+                        "_and": [
+                          {
+                            "user_id": {
+                              "_eq": "X-Hasura-User-Id"
+                            }
+                          },
+                          {
+                            "role": {
+                              "_in": [
+                                "owner",
+                                "editor"
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "delete_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "filter": {
+                    "organization": {
+                      "members": {
+                        "_and": [
+                          {
+                            "user_id": {
+                              "_eq": "X-Hasura-User-Id"
+                            }
+                          },
+                          {
+                            "role": {
+                              "_eq": "owner"
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "table": {
+              "schema": "public",
+              "name": "workflow_steps"
+            },
+            "object_relationships": [
+              {
+                "name": "workflow",
+                "using": {
+                  "foreign_key_constraint_on": "workflow_id"
+                }
+              }
+            ],
+            "array_relationships": [
+              {
+                "name": "step_runs",
+                "using": {
+                  "foreign_key_constraint_on": {
+                    "column": "workflow_step_id",
+                    "table": {
+                      "schema": "public",
+                      "name": "step_runs"
+                    }
+                  }
+                }
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": "*",
+                  "filter": {
+                    "workflow": {
+                      "organization": {
+                        "members": {
+                          "user_id": {
+                            "_eq": "X-Hasura-User-Id"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "insert_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": [
+                    "workflow_id",
+                    "position",
+                    "type",
+                    "config"
+                  ],
+                  "check": {
+                    "_or": [
+                      {
+                        "_and": [
+                          {
+                            "type": {
+                              "_nin": [
+                                "db_write",
+                                "notify"
+                              ]
+                            }
+                          },
+                          {
+                            "workflow": {
+                              "organization": {
+                                "members": {
+                                  "_and": [
+                                    {
+                                      "user_id": {
+                                        "_eq": "X-Hasura-User-Id"
+                                      }
+                                    },
+                                    {
+                                      "role": {
+                                        "_in": [
+                                          "owner",
+                                          "editor"
+                                        ]
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "_and": [
+                          {
+                            "type": {
+                              "_in": [
+                                "db_write",
+                                "notify"
+                              ]
+                            }
+                          },
+                          {
+                            "workflow": {
+                              "organization": {
+                                "members": {
+                                  "_and": [
+                                    {
+                                      "user_id": {
+                                        "_eq": "X-Hasura-User-Id"
+                                      }
+                                    },
+                                    {
+                                      "role": {
+                                        "_eq": "owner"
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "update_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": [
+                    "position",
+                    "type",
+                    "config"
+                  ],
+                  "filter": {
+                    "workflow": {
+                      "organization": {
+                        "members": {
+                          "_and": [
+                            {
+                              "user_id": {
+                                "_eq": "X-Hasura-User-Id"
+                              }
+                            },
+                            {
+                              "role": {
+                                "_in": [
+                                  "owner",
+                                  "editor"
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  },
+                  "check": {
+                    "_or": [
+                      {
+                        "_and": [
+                          {
+                            "type": {
+                              "_nin": [
+                                "db_write",
+                                "notify"
+                              ]
+                            }
+                          },
+                          {
+                            "workflow": {
+                              "organization": {
+                                "members": {
+                                  "_and": [
+                                    {
+                                      "user_id": {
+                                        "_eq": "X-Hasura-User-Id"
+                                      }
+                                    },
+                                    {
+                                      "role": {
+                                        "_in": [
+                                          "owner",
+                                          "editor"
+                                        ]
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "_and": [
+                          {
+                            "type": {
+                              "_in": [
+                                "db_write",
+                                "notify"
+                              ]
+                            }
+                          },
+                          {
+                            "workflow": {
+                              "organization": {
+                                "members": {
+                                  "_and": [
+                                    {
+                                      "user_id": {
+                                        "_eq": "X-Hasura-User-Id"
+                                      }
+                                    },
+                                    {
+                                      "role": {
+                                        "_eq": "owner"
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "delete_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "filter": {
+                    "workflow": {
+                      "organization": {
+                        "members": {
+                          "_and": [
+                            {
+                              "user_id": {
+                                "_eq": "X-Hasura-User-Id"
+                              }
+                            },
+                            {
+                              "role": {
+                                "_in": [
+                                  "owner",
+                                  "editor"
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "table": {
+              "schema": "public",
+              "name": "workflow_triggers"
+            },
+            "object_relationships": [
+              {
+                "name": "workflow",
+                "using": {
+                  "foreign_key_constraint_on": "workflow_id"
+                }
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": "*",
+                  "filter": {
+                    "workflow": {
+                      "organization": {
+                        "members": {
+                          "user_id": {
+                            "_eq": "X-Hasura-User-Id"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "insert_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": [
+                    "workflow_id",
+                    "type",
+                    "config"
+                  ],
+                  "check": {
+                    "_or": [
+                      {
+                        "_and": [
+                          {
+                            "type": {
+                              "_neq": "webhook"
+                            }
+                          },
+                          {
+                            "workflow": {
+                              "organization": {
+                                "members": {
+                                  "_and": [
+                                    {
+                                      "user_id": {
+                                        "_eq": "X-Hasura-User-Id"
+                                      }
+                                    },
+                                    {
+                                      "role": {
+                                        "_in": [
+                                          "owner",
+                                          "editor"
+                                        ]
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "_and": [
+                          {
+                            "type": {
+                              "_eq": "webhook"
+                            }
+                          },
+                          {
+                            "workflow": {
+                              "organization": {
+                                "members": {
+                                  "_and": [
+                                    {
+                                      "user_id": {
+                                        "_eq": "X-Hasura-User-Id"
+                                      }
+                                    },
+                                    {
+                                      "role": {
+                                        "_eq": "owner"
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "update_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": [
+                    "type",
+                    "config"
+                  ],
+                  "filter": {
+                    "workflow": {
+                      "organization": {
+                        "members": {
+                          "user_id": {
+                            "_eq": "X-Hasura-User-Id"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "check": {
+                    "_or": [
+                      {
+                        "_and": [
+                          {
+                            "type": {
+                              "_neq": "webhook"
+                            }
+                          },
+                          {
+                            "workflow": {
+                              "organization": {
+                                "members": {
+                                  "_and": [
+                                    {
+                                      "user_id": {
+                                        "_eq": "X-Hasura-User-Id"
+                                      }
+                                    },
+                                    {
+                                      "role": {
+                                        "_in": [
+                                          "owner",
+                                          "editor"
+                                        ]
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "_and": [
+                          {
+                            "type": {
+                              "_eq": "webhook"
+                            }
+                          },
+                          {
+                            "workflow": {
+                              "organization": {
+                                "members": {
+                                  "_and": [
+                                    {
+                                      "user_id": {
+                                        "_eq": "X-Hasura-User-Id"
+                                      }
+                                    },
+                                    {
+                                      "role": {
+                                        "_eq": "owner"
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "delete_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "filter": {
+                    "workflow": {
+                      "organization": {
+                        "members": {
+                          "user_id": {
+                            "_eq": "X-Hasura-User-Id"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "table": {
+              "schema": "public",
+              "name": "workflow_runs"
+            },
+            "object_relationships": [
+              {
+                "name": "workflow",
+                "using": {
+                  "foreign_key_constraint_on": "workflow_id"
+                }
+              }
+            ],
+            "array_relationships": [
+              {
+                "name": "step_runs",
+                "using": {
+                  "foreign_key_constraint_on": {
+                    "column": "workflow_run_id",
+                    "table": {
+                      "schema": "public",
+                      "name": "step_runs"
+                    }
+                  }
+                }
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": "*",
+                  "filter": {
+                    "workflow": {
+                      "organization": {
+                        "members": {
+                          "user_id": {
+                            "_eq": "X-Hasura-User-Id"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "delete_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "filter": {
+                    "workflow": {
+                      "organization": {
+                        "members": {
+                          "_and": [
+                            {
+                              "user_id": {
+                                "_eq": "X-Hasura-User-Id"
+                              }
+                            },
+                            {
+                              "role": {
+                                "_eq": "owner"
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "table": {
+              "schema": "public",
+              "name": "step_runs"
+            },
+            "object_relationships": [
+              {
+                "name": "workflow_run",
+                "using": {
+                  "foreign_key_constraint_on": "workflow_run_id"
+                }
+              },
+              {
+                "name": "workflow_step",
+                "using": {
+                  "foreign_key_constraint_on": "workflow_step_id"
+                }
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": "*",
+                  "filter": {
+                    "workflow_run": {
+                      "workflow": {
+                        "organization": {
+                          "members": {
+                            "user_id": {
+                              "_eq": "X-Hasura-User-Id"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "table": {
+              "schema": "public",
+              "name": "workflow_outputs"
+            },
+            "object_relationships": [
+              {
+                "name": "organization",
+                "using": {
+                  "foreign_key_constraint_on": "org_id"
+                }
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": "*",
+                  "filter": {
+                    "organization": {
+                      "members": {
+                        "user_id": {
+                          "_eq": "X-Hasura-User-Id"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "table": {
+              "schema": "public",
+              "name": "watched_events"
+            },
+            "object_relationships": [
+              {
+                "name": "organization",
+                "using": {
+                  "foreign_key_constraint_on": "org_id"
+                }
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": "*",
+                  "filter": {
+                    "organization": {
+                      "members": {
+                        "user_id": {
+                          "_eq": "X-Hasura-User-Id"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "insert_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": [
+                    "org_id",
+                    "event_type",
+                    "payload"
+                  ],
+                  "check": {
+                    "organization": {
+                      "members": {
+                        "user_id": {
+                          "_eq": "X-Hasura-User-Id"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "table": {
+              "schema": "public",
+              "name": "notifications"
+            },
+            "object_relationships": [
+              {
+                "name": "organization",
+                "using": {
+                  "foreign_key_constraint_on": "org_id"
+                }
+              }
+            ],
+            "select_permissions": [
+              {
+                "role": "user",
+                "permission": {
+                  "columns": "*",
+                  "filter": {
+                    "organization": {
+                      "members": {
+                        "user_id": {
+                          "_eq": "X-Hasura-User-Id"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "table": {
+              "schema": "public",
+              "name": "org_usage_month"
+            }
+          }
+        ],
+        "configuration": {
+          "connection_info": {
+            "use_prepared_statements": false
+          }
+        }
+      }
+    ],
+    "actions": [
+      {
+        "name": "triggerWorkflowRun",
+        "definition": {
+          "kind": "synchronous",
+          "handler": "{{NHOST_FUNCTIONS_URL}}/trigger-workflow-run",
+          "type": "mutation",
+          "arguments": [
+            {
+              "name": "workflow_id",
+              "type": "uuid!"
+            },
+            {
+              "name": "payload",
+              "type": "jsonb"
+            }
+          ],
+          "output_type": "WorkflowRunResult!",
+          "forward_client_headers": false
+        },
+        "permissions": [
+          {
+            "role": "user"
+          }
+        ]
+      },
+      {
+        "name": "approveStep",
+        "definition": {
+          "kind": "synchronous",
+          "handler": "{{NHOST_FUNCTIONS_URL}}/approve-step",
+          "type": "mutation",
+          "arguments": [
+            {
+              "name": "step_run_id",
+              "type": "uuid!"
+            }
+          ],
+          "output_type": "WorkflowRunResult!",
+          "forward_client_headers": false
+        },
+        "permissions": [
+          {
+            "role": "user"
+          }
+        ]
+      },
+      {
+        "name": "triggerWorkflowWebhook",
+        "definition": {
+          "kind": "synchronous",
+          "handler": "{{NHOST_FUNCTIONS_URL}}/trigger-workflow-webhook",
+          "type": "mutation",
+          "arguments": [
+            {
+              "name": "workflow_id",
+              "type": "uuid!"
+            },
+            {
+              "name": "payload",
+              "type": "jsonb"
+            }
+          ],
+          "output_type": "WorkflowRunResult!",
+          "forward_client_headers": true
+        },
+        "permissions": [
+          {
+            "role": "public"
+          }
+        ]
+      }
+    ],
+    "custom_types": {
+      "objects": [
+        {
+          "name": "WorkflowRunResult",
+          "fields": [
+            {
+              "name": "run_id",
+              "type": "uuid!"
+            },
+            {
+              "name": "status",
+              "type": "String!"
+            }
+          ]
+        }
+      ],
+      "scalars": []
+    },
+    "event_triggers": [
+      {
+        "name": "notify_event",
+        "table": {
+          "schema": "public",
+          "name": "notifications"
+        },
+        "insert": {
+          "columns": "*"
+        },
+        "update": {
+          "columns": []
+        },
+        "delete": {
+          "columns": []
+        },
+        "webhook": "{{NHOST_FUNCTIONS_URL}}/notify-handler",
+        "retry_conf": {
+          "num_retries": 3,
+          "retry_interval_seconds": 10,
+          "timeout_seconds": 30
+        }
+      },
+      {
+        "name": "workflow_database_event",
+        "table": {
+          "schema": "public",
+          "name": "workflow_outputs"
+        },
+        "insert": {
+          "columns": "*"
+        },
+        "update": {
+          "columns": []
+        },
+        "delete": {
+          "columns": []
+        },
+        "webhook": "{{NHOST_FUNCTIONS_URL}}/database-event-trigger",
+        "retry_conf": {
+          "num_retries": 3,
+          "retry_interval_seconds": 10,
+          "timeout_seconds": 30
+        }
+      }
+    ],
+    "cron_triggers": [
+      {
+        "name": "scheduled_workflow_dispatch",
+        "webhook": "{{NHOST_FUNCTIONS_URL}}/run-scheduled-workflows",
+        "schedule": "* * * * *",
+        "include_in_metadata": true,
+        "payload": {}
+      },
+      {
+        "name": "monthly_usage_reset",
+        "webhook": "{{NHOST_FUNCTIONS_URL}}/usage-reset",
+        "schedule": "0 0 1 * *",
+        "include_in_metadata": true,
+        "payload": {}
+      }
+    ]
+  }
+}
