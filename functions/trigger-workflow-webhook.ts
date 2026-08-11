@@ -8,7 +8,7 @@ export default async function handler(req:Request,res:Response){
   try{
     const workflowId=req.body?.input?.workflow_id||req.body?.workflow_id||req.query.workflow_id;
     const secret=req.headers['x-webhook-secret'];
-    if(!secret||secret!==process.env.WEBHOOK_SECRET)return res.status(401).json({message:'Invalid webhook secret'});
+    if(!secret||secret!==process.env.NHOST_WEBHOOK_SECRET)return res.status(401).json({message:'Invalid webhook secret'});
     if(!workflowId)return res.status(400).json({message:'workflow_id is required'});
     const workflow=(await gql<any>(WORKFLOW,{id:workflowId})).workflows_by_pk;
     if(!workflow)return res.status(404).json({message:'Workflow not found'});
