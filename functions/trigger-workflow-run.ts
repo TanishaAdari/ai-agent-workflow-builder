@@ -83,14 +83,39 @@ export default async function handler(req:Request,res:Response){
   try{
     const input=req.body?.input||{};
     const workflowId=input.workflow_id;
-    const userId=req.body?.session_variables?.['x-hasura-user-id'];
-    if(!workflowId||!userId)return res.status(401).json({message:'Authentication required'});
+    const sessionVariables=req.body?.session_variables||{};
+    const userId=sessionVariables['x-hasura-user-id'];
+    const sessionRole=sessionVariables['x-hasura-role'];
+
+    if(!workflowId||!userId){
+      return res.status(401).json({message:'Authentication required'});
+    }
+
     const data=await gql<any>(WORKFLOW,{id:workflowId});
     const workflow=data.workflows_by_pk;
-    if(!workflow)return res.status(404).json({message:'Workflow not found'});
-    const member=await gql<any>(MEMBER,{orgId:workflow.org_id,userId});
-    const role=member.org_members?.[0]?.role;
-    if(!['owner','editor'].includes(role))return res.status(403).json({message:'You cannot trigger this workflow'});
+
+    if(!workflow){
+      return res.status(404).json({message:'Workflow not found'});
+    }
+
+    let role:string|undefined;
+
+    if(sessionRole==='admin'){
+      role='owner';
+    }else{
+      const member=await gql<any>(MEMBER,{
+        orgId:workflow.org_id,
+        userId
+      });
+
+      role=member.org_members?.[0]?.role;
+
+      if(!role || !['owner','editor'].includes(role)){
+        return res.status(403).json({
+          message:'You cannot trigger this workflow'
+        });
+      }
+    }
     const org=(await gql<any>(ORG,{id:workflow.org_id})).organizations_by_pk;
     if(!org||org.calls_used>=org.calls_allowed)return res.status(429).json({message:'Organization quota exhausted'});
     const run=(await gql<any>(CREATE_RUN,{run:{workflow_id:workflowId,status:'running',input:input.payload||{}}})).insert_workflow_runs_one;
